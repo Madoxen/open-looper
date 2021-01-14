@@ -10,8 +10,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //remove weird shadow in navigation view bottom bar
-        //bottom_nav_view.background = null
 
     }
 }

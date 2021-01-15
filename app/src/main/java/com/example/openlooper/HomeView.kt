@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -63,15 +62,15 @@ class HomeView : Fragment() {
 
             track = Polyline();
             track?.setPoints(t)
-            map.overlayManager.add(track); //TODO: remove existing track
+            map.overlayManager.add(track);
         })
 
 
         vm.getRoute();
 
-        mBottomFAB.setOnClickListener({
+        mBottomFAB.setOnClickListener {
             mBottomBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED)
-        })
+        }
         return view
     }
 

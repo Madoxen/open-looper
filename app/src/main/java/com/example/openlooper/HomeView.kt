@@ -12,21 +12,20 @@ import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.get
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.example.openlooper.VM.RouteVM
-import com.google.android.material.bottomappbar.BottomAppBar
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.internal.NavigationMenu
 import com.google.android.material.navigation.NavigationView
@@ -106,8 +105,7 @@ class HomeView : Fragment(), LocationListener {
         })
 
         //Listen to FAB clicks
-
-        vm.getRoute();
+        vm.getNewRoute();
 
 
         mBottomBehavior.setState(BottomSheetBehavior.STATE_HIDDEN)

@@ -18,7 +18,7 @@ data class GETRoundRoute(
             options: Options,
             instructions: Boolean = false
         ): GETRoundRoute {
-            //Switch places, because ORS has swiched places of longitude and latitude
+            //Switch places, because ORS has switched places of longitude and latitude
             return GETRoundRoute(
                 listOf(listOf<Double>(point.longitude, point.latitude)),
                 options,

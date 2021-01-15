@@ -1,12 +1,19 @@
 package com.example.openlooper
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -22,13 +29,16 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 const val REQUEST_LOCATION_CODE = 1000;
 
-class HomeView : Fragment() {
+class HomeView : Fragment(), LocationListener {
 
     val vm: RouteVM by viewModels();
+    lateinit var locationManager : LocationManager;
+
     lateinit var map: MapView;
     var locationOverlay: MyLocationNewOverlay? = null;
     lateinit var mBottomAppBar: BottomAppBar;
@@ -47,6 +57,9 @@ class HomeView : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home_view, container, false)
+
+        locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager;
+
 
         //Swipe bottom menu
         mBottomAppBar = view.findViewById(R.id.bottom_app_bar)
@@ -112,14 +125,17 @@ class HomeView : Fragment() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    @SuppressLint("MissingPermission")
     private fun onLocationRequestAllowed() {
         if (!map.overlays.contains(locationOverlay)) {
-            val overlay = MyLocationNewOverlay(GpsMyLocationProvider(requireContext()), map);
+            val provider = GpsMyLocationProvider(requireContext());
+            val overlay = MyLocationNewOverlay(provider, map);
             overlay.enableMyLocation();
             overlay.enableFollowLocation();
             map.overlays.add(overlay);
             map.controller.setCenter(overlay.myLocation);
             locationOverlay = overlay;
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 5.0f, this)
         }
     }
 
@@ -132,5 +148,10 @@ class HomeView : Fragment() {
             onLocationRequestAllowed();
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onLocationChanged(location: Location) {
+        Toast.makeText(requireContext(), location.longitude.toString() + "  " +  location.latitude.toString(), Toast.LENGTH_LONG).show();
+        vm.addPoint(GeoPoint(location.latitude, location.longitude))
     }
 }

@@ -32,10 +32,10 @@ class RouteVM : ViewModel() {
     val currentRoute: LiveData<List<GeoPoint>> = MutableLiveData<List<GeoPoint>>();
 
     init {
-        getRoute();
+        clearRoute();
     }
 
-    fun getRoute(point: GeoPoint = GeoPoint(51.0, 0.0)) {
+    fun getNewRoute(point: GeoPoint = GeoPoint(51.0, 0.0)) {
         //Launch coroutine
         viewModelScope.launch {
             try {
@@ -56,10 +56,19 @@ class RouteVM : ViewModel() {
         }
     }
 
+    fun clearRoute()
+    {
+        if (currentRoute is MutableLiveData<List<GeoPoint>>)
+            currentRoute.value = listOf();
+    }
+
     //Adds point to currentRoute
     fun addPoint(point: GeoPoint) {
         if (currentRoute is MutableLiveData<List<GeoPoint>>) {
-
+            //This is wasteful, because we are throwing entire list away instead of modifying already existing one.
+            val l: MutableList<GeoPoint> = currentRoute.value?.toMutableList() ?: mutableListOf();
+            l.add(point);
+            currentRoute.value = l;
         }
     }
 

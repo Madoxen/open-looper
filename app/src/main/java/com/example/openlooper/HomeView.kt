@@ -9,13 +9,17 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.Toast
-import androidx.core.content.ContextCompat
+import android.view.*
 import androidx.fragment.app.Fragment
+import android.widget.LinearLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.activity.viewModels
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.GravityCompat
+import androidx.core.view.get
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
@@ -23,6 +27,11 @@ import com.example.openlooper.VM.RouteVM
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.internal.NavigationMenu
+import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.fragment_home_view.*
+import kotlinx.android.synthetic.main.fragment_home_view.view.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -45,6 +54,9 @@ class HomeView : Fragment(), LocationListener {
     lateinit var mBottomSheet: LinearLayout;
     lateinit var mBottomBehavior: BottomSheetBehavior<View>;
     lateinit var mBottomFAB: FloatingActionButton
+    lateinit var mBottomNavigationView: BottomNavigationView
+    lateinit var mFavoriteSide: NavigationView
+
     var track: Polyline? = null;
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,14 +77,18 @@ class HomeView : Fragment(), LocationListener {
         mBottomAppBar = view.findViewById(R.id.bottom_app_bar)
         mBottomFAB = view.findViewById(R.id.bottom_FAB)
         mBottomSheet = view.findViewById(R.id.bottom_sheet_swipe)
-        mBottomBehavior =
-            BottomSheetBehavior.from(mBottomSheet.findViewById(R.id.bottom_sheet_swipe))
+        mBottomBehavior = BottomSheetBehavior.from(mBottomSheet.findViewById(R.id.bottom_sheet_swipe))
+        mBottomNavigationView = view.findViewById(R.id.bottom_nav_view)
+        mFavoriteSide = view.findViewById((R.id.favorite_side))
+        //Remove weird navbar view
+        mBottomAppBar.bottom_nav_view.setBackground(null)
 
 
+        //Set some defaults
         //Set preferences (e.g user-agent for osmdroid)
         Configuration.getInstance()
             .load(this.context, PreferenceManager.getDefaultSharedPreferences(this.context));
-        //Set some defaults
+
         map = view.findViewById(R.id.mapview);
         map.controller.setZoom(16.0);
         map.controller.setCenter(GeoPoint(51.0, 0.0))
@@ -90,9 +106,15 @@ class HomeView : Fragment(), LocationListener {
         })
 
         //Listen to FAB clicks
+
+        vm.getRoute();
+
+
+        mBottomBehavior.setState(BottomSheetBehavior.STATE_HIDDEN)
         mBottomFAB.setOnClickListener {
             mBottomBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED)
         }
+
 
         //Check if we already have a permission to access fine location
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -103,6 +125,15 @@ class HomeView : Fragment(), LocationListener {
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 REQUEST_LOCATION_CODE
             );
+        }
+
+        mBottomNavigationView.setOnNavigationItemSelectedListener {
+            when(it.itemId){
+                R.id.favorite_buttom -> view.drawer_layout_home.openDrawer(GravityCompat.START)
+                R.id.record_buttom -> Log.v("Route", "There record your route")
+            }
+            true
+
         }
 
         return view

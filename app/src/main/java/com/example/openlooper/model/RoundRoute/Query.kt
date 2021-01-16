@@ -12,7 +12,7 @@ package com.example.openlooper.model.RoundRoute
 import com.google.gson.annotations.SerializedName
 data class Query (
 
-	@SerializedName("coordinates") val coordinates : List<List<Int>>,
+	@SerializedName("coordinates") val coordinates : List<List<Double>>,
 	@SerializedName("profile") val profile : String,
 	@SerializedName("format") val format : String,
 	@SerializedName("options") val options : Options

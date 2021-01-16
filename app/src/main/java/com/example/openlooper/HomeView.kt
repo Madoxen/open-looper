@@ -55,6 +55,7 @@ class HomeView : Fragment(), LocationListener {
     lateinit var mBottomFAB: FloatingActionButton
     lateinit var mBottomNavigationView: BottomNavigationView
     lateinit var mFavoriteSide: NavigationView
+    var isRecording = false;
 
     var track: Polyline? = null;
 
@@ -106,9 +107,7 @@ class HomeView : Fragment(), LocationListener {
 
 
         mBottomBehavior.setState(BottomSheetBehavior.STATE_HIDDEN)
-        mBottomFAB.setOnClickListener {
-            mBottomBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED)
-        }
+
 
 
         //Check if we already have a permission to access fine location
@@ -124,8 +123,18 @@ class HomeView : Fragment(), LocationListener {
 
         mBottomNavigationView.setOnNavigationItemSelectedListener {
             when(it.itemId){
-                R.id.favorite_buttom -> view.drawer_layout_home.openDrawer(GravityCompat.START)
-                R.id.record_buttom -> Log.v("Route", "There record your route")
+                R.id.favorite_buttom -> {
+                    mBottomFAB.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_find_replace_24))
+                    mBottomFAB.setOnClickListener {
+                        FAB_FindRoute();
+                    }
+                }
+                R.id.record_buttom ->  {
+                    mBottomFAB.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_not_started_24))
+                    mBottomFAB.setOnClickListener {
+                        FAB_ToggleRecord();
+                    }
+                }
             }
             true
         }
@@ -177,6 +186,18 @@ class HomeView : Fragment(), LocationListener {
 
     override fun onLocationChanged(location: Location) {
         Toast.makeText(requireContext(), location.longitude.toString() + "  " +  location.latitude.toString(), Toast.LENGTH_LONG).show();
+        vm.lastPoint = GeoPoint(location.latitude, location.longitude)
         vm.addPoint(GeoPoint(location.latitude, location.longitude))
+    }
+
+
+    private fun FAB_FindRoute()
+    {
+        vm.lastPoint?.let { vm.getNewRoute(it) };
+    }
+
+    private fun FAB_ToggleRecord()
+    {
+
     }
 }

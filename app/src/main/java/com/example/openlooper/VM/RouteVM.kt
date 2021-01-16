@@ -30,6 +30,9 @@ class RouteVM : ViewModel() {
 
     private val service: ORSService = retrofit.create(ORSService::class.java)
     val currentRoute: LiveData<List<GeoPoint>> = MutableLiveData<List<GeoPoint>>();
+    var lastPoint: GeoPoint? = null;
+
+
 
     init {
         clearRoute();

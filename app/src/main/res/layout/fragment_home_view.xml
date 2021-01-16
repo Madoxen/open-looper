@@ -78,6 +78,18 @@
         android:layout_gravity="start"
         >
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_to_favorite_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:src="@drawable/ic_baseline_add_24"
+            android:focusable="true"
+            android:layout_gravity="end|bottom"
+            android:layout_marginBottom="30dp"
+            android:layout_marginRight="30dp"
+            />
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -92,6 +104,7 @@
                 android:layout_height="wrap_content"
                 />
         </LinearLayout>
+
 
     </com.google.android.material.navigation.NavigationView>
 

@@ -85,7 +85,7 @@
 
             >
             <include layout="@layout/favorite_header"/>
-            <ListView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/favorite_list_view"
                 android:layout_weight="7"
                 android:layout_width="match_parent"

@@ -24,9 +24,12 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.get
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import com.example.openlooper.VM.FavoriteVM
 import com.example.openlooper.VM.RouteVM
+import com.example.openlooper.VM.adapter.AdapterFavRoute
+import com.example.openlooper.model.Favorite
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.internal.NavigationMenu
 import com.google.android.material.navigation.NavigationView
@@ -46,6 +49,7 @@ const val REQUEST_LOCATION_CODE = 1000;
 class HomeView : Fragment(), LocationListener {
 
     val vm: RouteVM by viewModels();
+    val vmFav: FavoriteVM by viewModels();
     lateinit var locationManager : LocationManager;
 
     lateinit var map: MapView;
@@ -134,6 +138,17 @@ class HomeView : Fragment(), LocationListener {
             true
 
         }
+
+        // Recyclerview
+        val adapter = AdapterFavRoute()
+        val recyclerView = view.favorite_list_view
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        vmFav.readAllFavorite.observe(viewLifecycleOwner, Observer { fav ->
+            adapter.setData(fav)
+        })
+
 
         return view
     }

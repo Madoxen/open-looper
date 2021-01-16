@@ -12,6 +12,7 @@ data class Favorite(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
     val name: String,
+    val distance: Double,
     val coordinates: List<GeoPoint>
 )
 

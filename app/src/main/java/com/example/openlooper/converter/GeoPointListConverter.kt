@@ -19,7 +19,7 @@ class GeoPointListConverter {
             strArr += "|"
         }
         strArr = strArr.dropLast(1)
-        Log.i("WTF",strArr)
+        //Log.i("WTF",strArr)
         return strArr
     }
 
@@ -31,7 +31,7 @@ class GeoPointListConverter {
         array.forEach{
             var doubleArr = it.split(":")
             var point = GeoPoint(doubleArr[0].toDouble(),doubleArr[1].toDouble(),doubleArr[2].toDouble())
-            Log.i("WTF","${point.latitude} : ${point.longitude} : ${point.altitude}")
+            //Log.i("WTF","${point.latitude} : ${point.longitude} : ${point.altitude}")
             list.add(point);
         }
         return Collections.unmodifiableList(list)

@@ -1,7 +1,6 @@
-package com.example.openlooper.view_model
+package com.example.openlooper.VM
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -11,7 +10,7 @@ import com.example.openlooper.repository.FavoriteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class FavoriteViewModel(application: Application): AndroidViewModel(application) {
+class FavoriteVM(application: Application): AndroidViewModel(application) {
 
     val readAllFavorite: LiveData<List<Favorite>>
     private val repository: FavoriteRepository
@@ -22,19 +21,19 @@ class FavoriteViewModel(application: Application): AndroidViewModel(application)
         readAllFavorite = repository.readAll
     }
 
-    fun addCourse(favorite: Favorite){
+    fun addFavorite(favorite: Favorite) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addFavorite(favorite)
         }
     }
 
-    fun updateCourse(favorite: Favorite){
+    fun updateFavorite(favorite: Favorite) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateFavorite(favorite)
         }
     }
 
-    fun deleteCourse(favorite: Favorite){
+    fun deleteFavorite(favorite: Favorite) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteFavorite(favorite)
         }

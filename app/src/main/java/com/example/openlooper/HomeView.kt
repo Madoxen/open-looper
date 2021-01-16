@@ -1,6 +1,7 @@
 package com.example.openlooper
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +15,9 @@ import androidx.activity.viewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
+import com.example.openlooper.VM.FavoriteVM
 import com.example.openlooper.VM.RouteVM
+import com.example.openlooper.model.Favorite
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -71,6 +74,13 @@ class HomeView : Fragment() {
         mBottomFAB.setOnClickListener {
             mBottomBehavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED)
         }
+
+        val vmF : FavoriteVM by viewModels();
+        vmF.addFavorite(Favorite(2,"MyLoop", arrayListOf(GeoPoint(9.0,2.0,2.0),GeoPoint(1.0,5.0,41.0))))
+
+
+
+
         return view
     }
 

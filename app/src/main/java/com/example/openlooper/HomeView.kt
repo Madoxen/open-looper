@@ -104,9 +104,6 @@ class HomeView : Fragment(), LocationListener {
             map.overlayManager.add(track);
         })
 
-        //Listen to FAB clicks
-        vm.getNewRoute();
-
 
         mBottomBehavior.setState(BottomSheetBehavior.STATE_HIDDEN)
         mBottomFAB.setOnClickListener {
@@ -131,7 +128,6 @@ class HomeView : Fragment(), LocationListener {
                 R.id.record_buttom -> Log.v("Route", "There record your route")
             }
             true
-
         }
 
         return view

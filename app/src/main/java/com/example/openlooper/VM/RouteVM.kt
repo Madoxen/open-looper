@@ -61,6 +61,12 @@ class RouteVM : ViewModel() {
         }
     }
 
+    fun setRoute(points: List<GeoPoint>)
+    {
+        if (currentRoute is MutableLiveData<List<GeoPoint>>)
+            currentRoute.value = points;
+    }
+
     fun clearRoute()
     {
         if (currentRoute is MutableLiveData<List<GeoPoint>>)

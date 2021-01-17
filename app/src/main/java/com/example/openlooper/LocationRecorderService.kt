@@ -1,57 +1,44 @@
 package com.example.openlooper
 
-import android.Manifest
 import android.R
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Binder
 import android.os.Build
+import android.os.Debug
 import android.os.IBinder
 import android.util.Log
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import org.osmdroid.util.GeoPoint
 
+typealias LocationChangedListener = (Location) -> Unit
 
 class LocationRecorderService : Service(), LocationListener {
 
-    lateinit var locationManager : LocationManager;
-    private var startMode: Int = START_STICKY            // indicates how to behave if the service is killed
-    private var binder: IBinder? = null        // interface for clients that bind
-    private var allowRebind: Boolean = false   // indicates whether onRebind should be used
+    private lateinit var locationManager: LocationManager;
+    private var binder: IBinder? = LocationRecorderBinder()        // interface for clients that bind
+    private val onLocationChangedCallbacks: MutableList<LocationChangedListener> = mutableListOf();
+    private val recordedRoute: MutableList<GeoPoint> = mutableListOf();
+    var isRecording: Boolean = false
+    get() = field
+    private set(value) {
+        field = value
+    }
+
 
 
     override fun onCreate() {
         // The service is being created
-
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager;
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
-        }
-
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 5f, this)
 
         createNotificationChannel();
-
         val notification: Notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.mipmap.sym_def_app_icon)
             .setContentTitle("OpenLooper")
@@ -62,22 +49,14 @@ class LocationRecorderService : Service(), LocationListener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // The service is starting, due to a call to startService()
+        //Start requesting location updates
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 5f, this)
         return START_STICKY
     }
 
     override fun onBind(intent: Intent): IBinder? {
         // A client is binding to the service with bindService()
         return binder
-    }
-
-    override fun onUnbind(intent: Intent): Boolean {
-        // All clients have unbound with unbindService()
-        return allowRebind
-    }
-
-    override fun onRebind(intent: Intent) {
-        // A client is binding to the service with bindService(),
-        // after onUnbind() has already been called
     }
 
     override fun onDestroy() {
@@ -102,9 +81,52 @@ class LocationRecorderService : Service(), LocationListener {
         }
     }
 
-
     override fun onLocationChanged(location: Location) {
-       Log.d("OpenLooperLRS", location.latitude.toString() + " " + location.longitude.toString());
+        Log.d("OpenLooperLRS", location.latitude.toString() + " " + location.longitude.toString());
+
+        if (isRecording)
+            recordedRoute.add(GeoPoint(location.latitude, location.longitude))
+
+        //Call every subscriber
+        onLocationChangedCallbacks.forEach {
+            it(location)
+        }
+    }
+
+
+    fun addLocationChangedListener(listener: LocationChangedListener) {
+        onLocationChangedCallbacks.add(listener)
+    }
+
+    fun removeLocationChangedListener(listener: LocationChangedListener) {
+        onLocationChangedCallbacks.remove(listener)
+    }
+
+    fun startRecording() {
+        isRecording = true;
+    }
+
+    fun stopRecording() {
+        isRecording = false;
+    }
+
+    fun resetRecording() {
+        recordedRoute.clear();
+    }
+
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    inner class LocationRecorderBinder : Binder() {
+        // Return this instance of LocalService so clients can call public methods
+        fun getService(): LocationRecorderService = this@LocationRecorderService
+    }
+
+
+    fun getRecordedRoute(): List<GeoPoint>
+    {
+        return recordedRoute;
     }
 
 }

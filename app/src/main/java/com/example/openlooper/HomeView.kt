@@ -2,21 +2,18 @@ package com.example.openlooper
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Notification
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.Toast
-import androidx.core.app.NotificationCompat
-import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -38,10 +35,11 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 
-
 class HomeView : Fragment() {
 
     val vm: RouteVM by viewModels();
+    private lateinit var mService: LocationRecorderService
+    private var mBound: Boolean = false
 
 
     lateinit var map: MapView;
@@ -56,9 +54,53 @@ class HomeView : Fragment() {
 
     var track: Polyline? = null;
 
+    /*SERVICES*/
+
+    /** Defines callbacks for service binding, passed to bindService()  */
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            val binder = service as LocationRecorderService.LocationRecorderBinder
+            mService = binder.getService()
+            mBound = true
+            //Get back our recording data
+            if (mService.isRecording) //if we even care about the route
+                vm.setRoute(mService.getRecordedRoute());
+
+
+            //Check if we already have a permission to access fine location
+            if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                onLocationRequestAllowed() //if we do, set location overlay
+            } else {
+                //if we dont, ask user for permission
+                requestPermissions(
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    REQUEST_LOCATION_CODE
+                );
+            }
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+            mService.removeLocationChangedListener(::onLocationChanged);
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        //This binds our client to the service
+        Intent(requireContext(), LocationRecorderService::class.java).also { intent ->
+            requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -71,7 +113,8 @@ class HomeView : Fragment() {
         mBottomAppBar = view.findViewById(R.id.bottom_app_bar)
         mBottomFAB = view.findViewById(R.id.bottom_FAB)
         mBottomSheet = view.findViewById(R.id.bottom_sheet_swipe)
-        mBottomBehavior = BottomSheetBehavior.from(mBottomSheet.findViewById(R.id.bottom_sheet_swipe))
+        mBottomBehavior =
+            BottomSheetBehavior.from(mBottomSheet.findViewById(R.id.bottom_sheet_swipe))
         mBottomNavigationView = view.findViewById(R.id.bottom_nav_view)
         mFavoriteSide = view.findViewById((R.id.favorite_side))
         //Remove weird navbar view
@@ -103,27 +146,27 @@ class HomeView : Fragment() {
         mBottomBehavior.setState(BottomSheetBehavior.STATE_HIDDEN)
 
 
-        //Check if we already have a permission to access fine location
-        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            onLocationRequestAllowed() //if we do, set location overlay
-        } else {
-            //if we dont, ask user for permission
-            requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_LOCATION_CODE
-            );
-        }
 
         mBottomNavigationView.setOnNavigationItemSelectedListener {
-            when(it.itemId){
+            when (it.itemId) {
                 R.id.favorite_buttom -> {
-                    mBottomFAB.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_find_replace_24))
+                    mBottomFAB.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            requireContext(),
+                            R.drawable.ic_baseline_find_replace_24
+                        )
+                    )
                     mBottomFAB.setOnClickListener {
                         FAB_FindRoute();
                     }
                 }
-                R.id.record_buttom ->  {
-                    mBottomFAB.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_not_started_24))
+                R.id.record_buttom -> {
+                    mBottomFAB.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            requireContext(),
+                            R.drawable.ic_baseline_not_started_24
+                        )
+                    )
                     mBottomFAB.setOnClickListener {
                         FAB_ToggleRecord();
                     }
@@ -145,6 +188,12 @@ class HomeView : Fragment() {
         map.onResume() //needed for compass, my location overlays, v6.0.0 and up
     }
 
+    override fun onStop() {
+        super.onStop()
+        requireActivity().unbindService(connection)
+        mBound = false
+    }
+
     private fun checkPermission(permission: String): Boolean {
         return ContextCompat.checkSelfPermission(
             requireContext(),
@@ -162,7 +211,7 @@ class HomeView : Fragment() {
             map.overlays.add(overlay);
             map.controller.setCenter(overlay.myLocation);
             locationOverlay = overlay;
-
+            mService.addLocationChangedListener(::onLocationChanged)
         }
     }
 
@@ -178,15 +227,28 @@ class HomeView : Fragment() {
     }
 
 
-    private fun FAB_FindRoute()
-    {
+    private fun FAB_FindRoute() {
         vm.lastPoint?.let { vm.getNewRoute(it) };
     }
 
-    private fun FAB_ToggleRecord()
-    {
+    private fun FAB_ToggleRecord() {
         val i = Intent(requireActivity(), LocationRecorderService::class.java);
         requireActivity().startService(i);
 
+        if (mService.isRecording) {
+            mService.stopRecording();
+            mService.resetRecording();
+            vm.clearRoute();
+        } else {
+            mService.startRecording();
+        }
     }
+
+    fun onLocationChanged(location: Location) {
+        val point = GeoPoint(location.latitude, location.longitude)
+        if (mService.isRecording)
+            vm.addPoint(point)
+        vm.lastPoint = point
+    }
+
 }

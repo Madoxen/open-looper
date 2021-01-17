@@ -158,17 +158,33 @@ class HomeView : Fragment() {
                     )
                     mBottomFAB.setOnClickListener {
                         FAB_FindRoute();
+                        mService.stopRecording();
+                        mService.resetRecording();
+                        vm.clearRoute();
                     }
                 }
                 R.id.record_buttom -> {
-                    mBottomFAB.setImageDrawable(
-                        ContextCompat.getDrawable(
-                            requireContext(),
-                            R.drawable.ic_baseline_not_started_24
+
+                    if (!mService.isRecording) {
+                        mBottomFAB.setImageDrawable(
+                            ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.ic_baseline_not_started_24
+                            )
                         )
-                    )
+                    } else {
+                        mBottomFAB.setImageDrawable(
+                            ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.ic_baseline_stop_circle_24
+                            )
+                        )
+                    }
+
                     mBottomFAB.setOnClickListener {
                         FAB_ToggleRecord();
+
+
                     }
                 }
             }
@@ -239,9 +255,23 @@ class HomeView : Fragment() {
             mService.stopRecording();
             mService.resetRecording();
             vm.clearRoute();
+            mBottomFAB.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_baseline_not_started_24
+                )
+            )
         } else {
             mService.startRecording();
+            mBottomFAB.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_baseline_stop_circle_24
+                )
+            )
         }
+
+
     }
 
     fun onLocationChanged(location: Location) {

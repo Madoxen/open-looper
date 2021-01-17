@@ -2,34 +2,32 @@ package com.example.openlooper
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Notification
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
-import android.view.*
-import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomappbar.BottomAppBar
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
-import androidx.core.view.get
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.example.openlooper.VM.RouteVM
+import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.internal.NavigationMenu
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
-import kotlinx.android.synthetic.main.fragment_home_view.*
 import kotlinx.android.synthetic.main.fragment_home_view.view.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
@@ -37,15 +35,14 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
-const val REQUEST_LOCATION_CODE = 1000;
 
-class HomeView : Fragment(), LocationListener {
+
+class HomeView : Fragment() {
 
     val vm: RouteVM by viewModels();
-    lateinit var locationManager : LocationManager;
+
 
     lateinit var map: MapView;
     var locationOverlay: MyLocationNewOverlay? = null;
@@ -69,9 +66,6 @@ class HomeView : Fragment(), LocationListener {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_home_view, container, false)
-
-        locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager;
-
 
         //Swipe bottom menu
         mBottomAppBar = view.findViewById(R.id.bottom_app_bar)
@@ -107,7 +101,6 @@ class HomeView : Fragment(), LocationListener {
 
 
         mBottomBehavior.setState(BottomSheetBehavior.STATE_HIDDEN)
-
 
 
         //Check if we already have a permission to access fine location
@@ -169,7 +162,7 @@ class HomeView : Fragment(), LocationListener {
             map.overlays.add(overlay);
             map.controller.setCenter(overlay.myLocation);
             locationOverlay = overlay;
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 5.0f, this)
+
         }
     }
 
@@ -184,12 +177,6 @@ class HomeView : Fragment(), LocationListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    override fun onLocationChanged(location: Location) {
-        Toast.makeText(requireContext(), location.longitude.toString() + "  " +  location.latitude.toString(), Toast.LENGTH_LONG).show();
-        vm.lastPoint = GeoPoint(location.latitude, location.longitude)
-        vm.addPoint(GeoPoint(location.latitude, location.longitude))
-    }
-
 
     private fun FAB_FindRoute()
     {
@@ -198,6 +185,8 @@ class HomeView : Fragment(), LocationListener {
 
     private fun FAB_ToggleRecord()
     {
+        val i = Intent(requireActivity(), LocationRecorderService::class.java);
+        requireActivity().startService(i);
 
     }
 }

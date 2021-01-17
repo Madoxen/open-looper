@@ -16,6 +16,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.osmdroid.util.GeoPoint
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class RouteVM : ViewModel() {
@@ -31,7 +33,7 @@ class RouteVM : ViewModel() {
     private val service: ORSService = retrofit.create(ORSService::class.java)
     val currentRoute: LiveData<List<GeoPoint>> = MutableLiveData<List<GeoPoint>>();
     var lastPoint: GeoPoint? = null;
-
+    val random: Random = Random();
 
 
     init {
@@ -44,7 +46,7 @@ class RouteVM : ViewModel() {
             try {
                 val s = service.getRoute(
                     "foot-walking", BuildConfig.ORS_API,
-                    GETRoundRoute.BuildFromGeoPoint(point, Options(Round_trip(10000, 1)))
+                    GETRoundRoute.BuildFromGeoPoint(point, Options(Round_trip(10000, random.nextInt())))
                 )
                 if (currentRoute is MutableLiveData<List<GeoPoint>>) {
                     val l: MutableList<GeoPoint> = ArrayList();

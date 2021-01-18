@@ -142,7 +142,8 @@ class HomeView : Fragment() {
         //Observe changes to the track
         vm.currentRoute.observe(viewLifecycleOwner, Observer { t ->
             track?.setPoints(t)
-            mDistanceText.text = vm.getRouteTotalLength().toString() + "km";
+            val distance = vm.getRouteTotalLength()
+            mDistanceText.text = "%.2f".format(distance) + "km";
             Log.e("Route changed", t.count().toString())
         })
 

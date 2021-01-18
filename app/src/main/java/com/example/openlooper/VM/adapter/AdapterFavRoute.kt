@@ -7,8 +7,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.openlooper.R
 import com.example.openlooper.model.Favorite
 import kotlinx.android.synthetic.main.favorite_one_row.view.*
+import java.lang.Exception
 
-class AdapterFavRoute : RecyclerView.Adapter<AdapterFavRoute.MyViewHolder>() {
+class AdapterFavRoute(
+    val itemOnClickCallback : (Favorite) -> Unit = {}
+) : RecyclerView.Adapter<AdapterFavRoute.MyViewHolder>() {
 
     private var favList = emptyList<Favorite>()
 
@@ -35,6 +38,10 @@ class AdapterFavRoute : RecyclerView.Adapter<AdapterFavRoute.MyViewHolder>() {
 
         holder.itemView.favorite_one_row_id.setOnClickListener {
             //Load route from database
+            try {
+                itemOnClickCallback(favList.get(position))
+            }
+            catch (e : Exception) {}
         }
     }
 

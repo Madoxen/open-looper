@@ -198,7 +198,9 @@ class HomeView : Fragment() {
         }
 
         // Recyclerview
-        val adapter = AdapterFavRoute()
+        val adapter = AdapterFavRoute {
+            vm.setRoute(it.coordinates)
+        }
         val recyclerView = view.favorite_list_view
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())

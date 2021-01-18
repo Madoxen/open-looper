@@ -6,4 +6,5 @@
     <string name="close">Close</string>
 
     <string name="favorite_header">Your saved routes!</string>
+    <string name="find_your_localization">Your localization</string>
 </resources>

@@ -38,18 +38,13 @@ class LocationRecorderService : Service(), LocationListener {
         // The service is being created
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager;
 
-        createNotificationChannel();
-        val notification: Notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.mipmap.sym_def_app_icon)
-            .setContentTitle("OpenLooper")
-            .setContentText("Recording your new favourite route!").build()
 
-        startForeground(1337, notification)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // The service is starting, due to a call to startService()
         //Start requesting location updates
+
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 5f, this)
         return START_STICKY
     }
@@ -58,6 +53,8 @@ class LocationRecorderService : Service(), LocationListener {
         // A client is binding to the service with bindService()
         return binder
     }
+
+
 
     override fun onDestroy() {
         // The service is no longer used and is being destroyed
@@ -104,10 +101,18 @@ class LocationRecorderService : Service(), LocationListener {
 
     fun startRecording() {
         isRecording = true;
+        createNotificationChannel();
+        val notification: Notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.mipmap.sym_def_app_icon)
+            .setContentTitle("OpenLooper")
+            .setContentText("Recording your new favourite route!").build()
+        startForeground(1337, notification)
     }
 
     fun stopRecording() {
         isRecording = false;
+        stopForeground(true)
+        stopSelf()
     }
 
     fun resetRecording() {

@@ -150,7 +150,9 @@ class HomeView : Fragment() {
 
         mBottomBehavior.setState(BottomSheetBehavior.STATE_HIDDEN)
 
-
+        mBottomFAB.setOnClickListener {
+            FAB_FindRoute();
+        }
 
         mBottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
@@ -163,9 +165,6 @@ class HomeView : Fragment() {
                     )
                     mBottomFAB.setOnClickListener {
                         FAB_FindRoute();
-                        mService.stopRecording();
-                        mService.resetRecording();
-                        vm.clearRoute();
                     }
                 }
                 R.id.record_buttom -> {
@@ -247,6 +246,9 @@ class HomeView : Fragment() {
 
 
     private fun FAB_FindRoute() {
+        mService.stopRecording();
+        mService.resetRecording();
+        vm.clearRoute();
         vm.lastPoint = locationOverlay?.myLocation;
         vm.lastPoint?.let { vm.getNewRoute(it) };
     }

@@ -20,8 +20,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
+import com.example.openlooper.VM.FavoriteVM
 import com.example.openlooper.VM.RouteVM
+import com.example.openlooper.VM.adapter.AdapterFavRoute
+import com.example.openlooper.model.Favorite
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -40,9 +44,10 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 class HomeView : Fragment() {
 
     val vm: RouteVM by viewModels();
+    val vmFav: FavoriteVM by viewModels();
+    lateinit var locationManager : LocationManager;
     private lateinit var mService: LocationRecorderService
     private var mBound: Boolean = false
-
 
     lateinit var map: MapView;
     var locationOverlay: MyLocationNewOverlay? = null;
@@ -192,6 +197,17 @@ class HomeView : Fragment() {
             }
             true
         }
+
+        // Recyclerview
+        val adapter = AdapterFavRoute()
+        val recyclerView = view.favorite_list_view
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        vmFav.readAllFavorite.observe(viewLifecycleOwner, Observer { fav ->
+            adapter.setData(fav)
+        })
+
 
         return view
     }

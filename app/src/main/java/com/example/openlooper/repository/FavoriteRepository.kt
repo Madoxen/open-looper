@@ -10,16 +10,16 @@ class FavoriteRepository(private val favoriteDao: FavoriteDao) {
 
     val readAll: LiveData<List<Favorite>> = favoriteDao.readAll()
 
-    suspend fun addFavorite(grade: Favorite){
-        favoriteDao.add(grade)
+    suspend fun addFavorite(fav: Favorite){
+        favoriteDao.add(fav)
     }
 
-    suspend fun updateFavorite(grade: Favorite){
-        favoriteDao.update(grade)
+    suspend fun updateFavorite(fav: Favorite){
+        favoriteDao.update(fav)
     }
 
-    suspend fun deleteFavorite(grade: Favorite){
-        favoriteDao.delete(grade)
+    suspend fun deleteFavorite(fav: Favorite){
+        favoriteDao.delete(fav)
     }
 
 }

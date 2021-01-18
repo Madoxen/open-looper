@@ -10,7 +10,7 @@ import org.osmdroid.util.GeoPoint
 @TypeConverters(GeoPointListConverter::class)
 data class Favorite(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Int = 0,
     val name: String,
     val distance: Double,
     val coordinates: List<GeoPoint>

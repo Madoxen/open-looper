@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.openlooper.VM.FavoriteVM
 import com.example.openlooper.VM.RouteVM
 import com.example.openlooper.VM.adapter.AdapterFavRoute
+import com.example.openlooper.model.Favorite
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -54,6 +55,7 @@ class HomeView : Fragment() {
     lateinit var mBottomBehavior: BottomSheetBehavior<View>
     lateinit var mBottomFAB: FloatingActionButton
     lateinit var mBottomNavigationView: BottomNavigationView
+    lateinit var mAddFavouriteFAB: FloatingActionButton
     lateinit var mFavoriteSide: NavigationView
     lateinit var mDistanceText: TextView
     lateinit var track: Polyline
@@ -119,6 +121,7 @@ class HomeView : Fragment() {
         mBottomNavigationView = view.findViewById(R.id.bottom_nav_view)
         mFavoriteSide = view.findViewById((R.id.favorite_side))
         mDistanceText = view.findViewById(R.id.distance_textView)
+        mAddFavouriteFAB = view.findViewById(R.id.add_to_favorite_fab)
         //Remove weird navbar view
         mBottomAppBar.bottom_nav_view.background = null
         track = Polyline()
@@ -144,11 +147,15 @@ class HomeView : Fragment() {
             Log.e("Route changed", t.count().toString())
         })
 
-
         mBottomBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
         mBottomFAB.setOnClickListener {
             FAB_FindRoute()
+        }
+
+        mAddFavouriteFAB.setOnClickListener() {
+            vm.currentRoute.value?.let {
+                vmFav.addFavorite(Favorite(0,"New favourite route!",vm.getRouteTotalLength(), it))
+            }
         }
 
         mBottomNavigationView.setOnNavigationItemSelectedListener {

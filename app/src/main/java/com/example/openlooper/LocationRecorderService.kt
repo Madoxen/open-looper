@@ -123,10 +123,8 @@ class LocationRecorderService : Service(), LocationListener {
         fun getService(): LocationRecorderService = this@LocationRecorderService
     }
 
-
     fun getRecordedRoute(): List<GeoPoint>
     {
         return recordedRoute;
     }
-
 }

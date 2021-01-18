@@ -1,5 +1,6 @@
 package com.example.openlooper.VM
 
+import android.os.Debug
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,6 +11,7 @@ import com.example.openlooper.model.GETRoundRoute
 import com.example.openlooper.model.ORSService
 import com.example.openlooper.model.RoundRoute.Options
 import com.example.openlooper.model.RoundRoute.Round_trip
+import com.example.openlooper.utils.GeographicalUtils.Companion.calculateGeographicalDistance
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -46,10 +48,13 @@ class RouteVM : ViewModel() {
             try {
                 val s = service.getRoute(
                     "foot-walking", BuildConfig.ORS_API,
-                    GETRoundRoute.BuildFromGeoPoint(point, Options(Round_trip(10000, random.nextInt())))
+                    GETRoundRoute.BuildFromGeoPoint(
+                        point,
+                        Options(Round_trip(10000, random.nextInt()))
+                    )
                 )
-                if (currentRoute is MutableLiveData<List<GeoPoint>>) {
-                    val l: MutableList<GeoPoint> = ArrayList();
+                if (currentRoute is MutableLiveData<*>) {
+                    val l: MutableList<GeoPoint> = mutableListOf()
                     s.features[0].geometry.coordinates.forEach {
                         l.add(GeoPoint(it[1], it[0]))
                     }
@@ -61,26 +66,37 @@ class RouteVM : ViewModel() {
         }
     }
 
-    fun setRoute(points: List<GeoPoint>)
-    {
-        if (currentRoute is MutableLiveData<List<GeoPoint>>)
-            currentRoute.value = points;
+    fun setRoute(points: List<GeoPoint>) {
+        if (currentRoute is MutableLiveData<*>)
+            currentRoute.value = points.toMutableList();
     }
 
-    fun clearRoute()
-    {
-        if (currentRoute is MutableLiveData<List<GeoPoint>>)
-            currentRoute.value = listOf();
+    fun clearRoute() {
+        if (currentRoute is MutableLiveData<*>)
+            currentRoute.value = mutableListOf<GeoPoint>();
     }
 
     //Adds point to currentRoute
     fun addPoint(point: GeoPoint) {
-        if (currentRoute is MutableLiveData<List<GeoPoint>>) {
+        if (currentRoute is MutableLiveData<*>) {
             //This is wasteful, because we are throwing entire list away instead of modifying already existing one.
-            val l: MutableList<GeoPoint> = currentRoute.value?.toMutableList() ?: mutableListOf();
+            val c = currentRoute.value as List<GeoPoint>;
+            val l: MutableList<GeoPoint> = c?.toMutableList() ?: mutableListOf<GeoPoint>();
             l.add(point);
             currentRoute.value = l;
         }
+    }
+
+    fun getRouteTotalLength(): Double {
+        var dist = 0.0;
+        currentRoute.value?.let {
+            val limit = it.count() - 2; //omit last value
+            if(limit < 1) return dist;
+            for (i in 0..limit) {
+                dist += calculateGeographicalDistance(it[i], it[i + 1])
+            }
+        }
+        return dist;
     }
 
 }

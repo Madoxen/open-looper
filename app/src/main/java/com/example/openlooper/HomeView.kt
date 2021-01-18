@@ -10,10 +10,12 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -50,9 +52,11 @@ class HomeView : Fragment() {
     lateinit var mBottomFAB: FloatingActionButton
     lateinit var mBottomNavigationView: BottomNavigationView
     lateinit var mFavoriteSide: NavigationView
+    lateinit var mDistanceText: TextView;
+    lateinit var track: Polyline;
     var isRecording = false;
 
-    var track: Polyline? = null;
+
 
     /*SERVICES*/
 
@@ -117,8 +121,10 @@ class HomeView : Fragment() {
             BottomSheetBehavior.from(mBottomSheet.findViewById(R.id.bottom_sheet_swipe))
         mBottomNavigationView = view.findViewById(R.id.bottom_nav_view)
         mFavoriteSide = view.findViewById((R.id.favorite_side))
+        mDistanceText = view.findViewById(R.id.distance_textView);
         //Remove weird navbar view
         mBottomAppBar.bottom_nav_view.setBackground(null)
+        track = Polyline();
 
 
         //Set some defaults
@@ -131,15 +137,13 @@ class HomeView : Fragment() {
         map.controller.setCenter(GeoPoint(51.0, 0.0))
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         map.setMultiTouchControls(true);
+        map.overlayManager.add(track);
 
         //Observe changes to the track
         vm.currentRoute.observe(viewLifecycleOwner, Observer { t ->
-            if (track != null)
-                map.overlayManager.remove(track);
-
-            track = Polyline();
             track?.setPoints(t)
-            map.overlayManager.add(track);
+            mDistanceText.text = vm.getRouteTotalLength().toString() + "km";
+            Log.e("Route changed", t.count().toString())
         })
 
 
@@ -183,8 +187,6 @@ class HomeView : Fragment() {
 
                     mBottomFAB.setOnClickListener {
                         FAB_ToggleRecord();
-
-
                     }
                 }
             }
@@ -244,6 +246,7 @@ class HomeView : Fragment() {
 
 
     private fun FAB_FindRoute() {
+        vm.lastPoint = locationOverlay?.myLocation;
         vm.lastPoint?.let { vm.getNewRoute(it) };
     }
 

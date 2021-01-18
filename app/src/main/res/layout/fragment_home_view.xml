@@ -21,6 +21,16 @@
 
     </org.osmdroid.views.MapView>
 
+    <TextView
+        android:id="@+id/distance_textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autoText="false"
+        android:gravity="center|top"
+        android:text="0 km"
+        android:textColor="@color/purple_700"
+        android:textSize="30sp" />
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

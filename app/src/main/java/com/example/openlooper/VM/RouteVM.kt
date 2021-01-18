@@ -47,7 +47,7 @@ class RouteVM : ViewModel() {
         viewModelScope.launch {
             try {
                 val s = service.getRoute(
-                    "foot-walking", BuildConfig.ORS_API,
+                    "foot-hiking", BuildConfig.ORS_API,
                     GETRoundRoute.BuildFromGeoPoint(
                         point,
                         Options(Round_trip(10000, random.nextInt()))

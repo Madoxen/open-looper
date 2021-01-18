@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2021 Kotlin Data Classes Generated from JSON powered by http://www.json2kotlin.com
 
@@ -10,11 +9,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 For support, please feel free to contact me at https://www.linkedin.com/in/syedabsar */
 package com.example.openlooper.model.RoundRoute
+
 import com.google.gson.annotations.SerializedName
 
-data class Engine (
+data class Engine(
 
-	@SerializedName("version") val version : String,
-	@SerializedName("build_date") val build_date : String,
-	@SerializedName("graph_date") val graph_date : String
+    @SerializedName("version") val version: String,
+    @SerializedName("build_date") val build_date: String,
+    @SerializedName("graph_date") val graph_date: String
 )

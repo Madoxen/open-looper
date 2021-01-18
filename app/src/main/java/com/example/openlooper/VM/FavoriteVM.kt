@@ -10,7 +10,7 @@ import com.example.openlooper.repository.FavoriteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class FavoriteVM(application: Application): AndroidViewModel(application) {
+class FavoriteVM(application: Application) : AndroidViewModel(application) {
 
     val readAllFavorite: LiveData<List<Favorite>>
     private val repository: FavoriteRepository

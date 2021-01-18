@@ -23,7 +23,7 @@ data class GETRoundRoute(
                 listOf(listOf<Double>(point.longitude, point.latitude)),
                 options,
                 instructions
-            );
+            )
         }
     }
 

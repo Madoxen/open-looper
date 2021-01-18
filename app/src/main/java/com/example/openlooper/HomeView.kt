@@ -20,12 +20,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.openlooper.VM.FavoriteVM
 import com.example.openlooper.VM.RouteVM
 import com.example.openlooper.VM.adapter.AdapterFavRoute
-import com.example.openlooper.model.Favorite
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -43,24 +42,22 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 class HomeView : Fragment() {
 
-    val vm: RouteVM by viewModels();
-    val vmFav: FavoriteVM by viewModels();
-    lateinit var locationManager : LocationManager;
+    val vm: RouteVM by viewModels()
+    val vmFav: FavoriteVM by viewModels()
     private lateinit var mService: LocationRecorderService
     private var mBound: Boolean = false
 
-    lateinit var map: MapView;
-    var locationOverlay: MyLocationNewOverlay? = null;
-    lateinit var mBottomAppBar: BottomAppBar;
-    lateinit var mBottomSheet: LinearLayout;
-    lateinit var mBottomBehavior: BottomSheetBehavior<View>;
+    lateinit var map: MapView
+    var locationOverlay: MyLocationNewOverlay? = null
+    lateinit var mBottomAppBar: BottomAppBar
+    lateinit var mBottomSheet: LinearLayout
+    lateinit var mBottomBehavior: BottomSheetBehavior<View>
     lateinit var mBottomFAB: FloatingActionButton
     lateinit var mBottomNavigationView: BottomNavigationView
     lateinit var mFavoriteSide: NavigationView
-    lateinit var mDistanceText: TextView;
-    lateinit var track: Polyline;
-    var isRecording = false;
-
+    lateinit var mDistanceText: TextView
+    lateinit var track: Polyline
+    var isRecording = false
 
 
     /*SERVICES*/
@@ -75,7 +72,7 @@ class HomeView : Fragment() {
             mBound = true
             //Get back our recording data
             if (mService.isRecording) //if we even care about the route
-                vm.setRoute(mService.getRecordedRoute());
+                vm.setRoute(mService.getRecordedRoute())
 
 
             //Check if we already have a permission to access fine location
@@ -86,13 +83,13 @@ class HomeView : Fragment() {
                 requestPermissions(
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     REQUEST_LOCATION_CODE
-                );
+                )
             }
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
             mBound = false
-            mService.removeLocationChangedListener(::onLocationChanged);
+            mService.removeLocationChangedListener(::onLocationChanged)
         }
     }
 
@@ -103,11 +100,6 @@ class HomeView : Fragment() {
             requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
 
-    }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
     }
 
 
@@ -126,37 +118,37 @@ class HomeView : Fragment() {
             BottomSheetBehavior.from(mBottomSheet.findViewById(R.id.bottom_sheet_swipe))
         mBottomNavigationView = view.findViewById(R.id.bottom_nav_view)
         mFavoriteSide = view.findViewById((R.id.favorite_side))
-        mDistanceText = view.findViewById(R.id.distance_textView);
+        mDistanceText = view.findViewById(R.id.distance_textView)
         //Remove weird navbar view
-        mBottomAppBar.bottom_nav_view.setBackground(null)
-        track = Polyline();
+        mBottomAppBar.bottom_nav_view.background = null
+        track = Polyline()
 
 
         //Set some defaults
         //Set preferences (e.g user-agent for osmdroid)
         Configuration.getInstance()
-            .load(this.context, PreferenceManager.getDefaultSharedPreferences(this.context));
+            .load(this.context, PreferenceManager.getDefaultSharedPreferences(this.context))
 
-        map = view.findViewById(R.id.mapview);
-        map.controller.setZoom(16.0);
+        map = view.findViewById(R.id.mapview)
+        map.controller.setZoom(16.0)
         map.controller.setCenter(GeoPoint(51.0, 0.0))
-        map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER);
-        map.setMultiTouchControls(true);
-        map.overlayManager.add(track);
+        map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
+        map.setMultiTouchControls(true)
+        map.overlayManager.add(track)
 
         //Observe changes to the track
         vm.currentRoute.observe(viewLifecycleOwner, Observer { t ->
-            track?.setPoints(t)
+            track.setPoints(t)
             val distance = vm.getRouteTotalLength()
-            mDistanceText.text = "%.2f".format(distance) + "km";
+            mDistanceText.text = "%.2f".format(distance) + "km"
             Log.e("Route changed", t.count().toString())
         })
 
 
-        mBottomBehavior.setState(BottomSheetBehavior.STATE_HIDDEN)
+        mBottomBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         mBottomFAB.setOnClickListener {
-            FAB_FindRoute();
+            FAB_FindRoute()
         }
 
         mBottomNavigationView.setOnNavigationItemSelectedListener {
@@ -169,7 +161,7 @@ class HomeView : Fragment() {
                         )
                     )
                     mBottomFAB.setOnClickListener {
-                        FAB_FindRoute();
+                        FAB_FindRoute()
                     }
                 }
                 R.id.record_buttom -> {
@@ -191,7 +183,7 @@ class HomeView : Fragment() {
                     }
 
                     mBottomFAB.setOnClickListener {
-                        FAB_ToggleRecord();
+                        FAB_ToggleRecord()
                     }
                 }
             }
@@ -238,13 +230,13 @@ class HomeView : Fragment() {
     @SuppressLint("MissingPermission")
     private fun onLocationRequestAllowed() {
         if (!map.overlays.contains(locationOverlay)) {
-            val provider = GpsMyLocationProvider(requireContext());
-            val overlay = MyLocationNewOverlay(provider, map);
-            overlay.enableMyLocation();
-            overlay.enableFollowLocation();
-            map.overlays.add(overlay);
-            map.controller.setCenter(overlay.myLocation);
-            locationOverlay = overlay;
+            val provider = GpsMyLocationProvider(requireContext())
+            val overlay = MyLocationNewOverlay(provider, map)
+            overlay.enableMyLocation()
+            overlay.enableFollowLocation()
+            map.overlays.add(overlay)
+            map.controller.setCenter(overlay.myLocation)
+            locationOverlay = overlay
             mService.addLocationChangedListener(::onLocationChanged)
         }
     }
@@ -255,28 +247,28 @@ class HomeView : Fragment() {
         grantResults: IntArray
     ) {
         if (requestCode == REQUEST_LOCATION_CODE) {
-            onLocationRequestAllowed();
+            onLocationRequestAllowed()
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
 
     private fun FAB_FindRoute() {
-        mService.stopRecording();
-        mService.resetRecording();
-        vm.clearRoute();
-        vm.lastPoint = locationOverlay?.myLocation;
-        vm.lastPoint?.let { vm.getNewRoute(it) };
+        mService.stopRecording()
+        mService.resetRecording()
+        vm.clearRoute()
+        vm.lastPoint = locationOverlay?.myLocation
+        vm.lastPoint?.let { vm.getNewRoute(it) }
     }
 
     private fun FAB_ToggleRecord() {
-        val i = Intent(requireActivity(), LocationRecorderService::class.java);
-        requireActivity().startService(i);
+        val i = Intent(requireActivity(), LocationRecorderService::class.java)
+        requireActivity().startService(i)
 
         if (mService.isRecording) {
-            mService.stopRecording();
-            mService.resetRecording();
-            vm.clearRoute();
+            mService.stopRecording()
+            mService.resetRecording()
+            vm.clearRoute()
             mBottomFAB.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
@@ -284,7 +276,7 @@ class HomeView : Fragment() {
                 )
             )
         } else {
-            mService.startRecording();
+            mService.startRecording()
             mBottomFAB.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),

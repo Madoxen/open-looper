@@ -9,9 +9,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 For support, please feel free to contact me at https://www.linkedin.com/in/syedabsar */
 package com.example.openlooper.model.RoundRoute
-import com.google.gson.annotations.SerializedName
-data class Properties (
 
-	@SerializedName("summary") val summary : Summary,
-	@SerializedName("way_points") val way_points : List<Int>
+import com.google.gson.annotations.SerializedName
+
+data class Properties(
+
+    @SerializedName("summary") val summary: Summary,
+    @SerializedName("way_points") val way_points: List<Int>
 )

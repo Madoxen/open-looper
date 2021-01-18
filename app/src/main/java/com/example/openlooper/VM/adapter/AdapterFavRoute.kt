@@ -12,7 +12,7 @@ class AdapterFavRoute : RecyclerView.Adapter<AdapterFavRoute.MyViewHolder>() {
 
     private var favList = emptyList<Favorite>()
 
-    class MyViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {}
+    class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         return MyViewHolder(
@@ -30,15 +30,15 @@ class AdapterFavRoute : RecyclerView.Adapter<AdapterFavRoute.MyViewHolder>() {
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentItem = favList[position]
-        holder.itemView.route_name_one_row.setText(currentItem.name)
-        holder.itemView.route_distance_one_row.setText("${currentItem.distance} km")
+        holder.itemView.route_name_one_row.text = currentItem.name
+        holder.itemView.route_distance_one_row.text = "${currentItem.distance} km"
 
         holder.itemView.favorite_one_row_id.setOnClickListener {
             //Load route from database
         }
     }
 
-    fun setData(fav: List<Favorite>){
+    fun setData(fav: List<Favorite>) {
         this.favList = fav
         notifyDataSetChanged()
     }

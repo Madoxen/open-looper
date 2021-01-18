@@ -2,12 +2,11 @@
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout_home"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeView"
     android:fitsSystemWindows="true"
-    android:id="@+id/drawer_layout_home"
-    >
+    tools:context=".HomeView">
 
     <org.osmdroid.views.MapView
         android:id="@+id/mapview"
@@ -39,8 +38,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
 
         <com.google.android.material.bottomappbar.BottomAppBar
@@ -49,20 +47,19 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             app:fabCradleMargin="20dp"
-            app:fabCradleVerticalOffset="10dp"
             app:fabCradleRoundedCornerRadius="20dp"
-            >
+            app:fabCradleVerticalOffset="10dp">
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_nav_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:menu="@menu/bottom_nav_menu"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:background="@android:color/transparent"
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottom_nav_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:background="@android:color/transparent"
+                app:menu="@menu/bottom_nav_menu"
 
-            />
+                />
 
         </com.google.android.material.bottomappbar.BottomAppBar>
 
@@ -79,27 +76,26 @@
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
-
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/favorite_side"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        >
+        android:layout_gravity="start">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical"
 
             >
-            <include layout="@layout/favorite_header"/>
+
+            <include layout="@layout/favorite_header" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/favorite_list_view"
-                android:layout_weight="7"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                />
+                android:layout_weight="7" />
         </LinearLayout>
 
     </com.google.android.material.navigation.NavigationView>

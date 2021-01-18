@@ -9,13 +9,14 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 For support, please feel free to contact me at https://www.linkedin.com/in/syedabsar */
 package com.example.openlooper.model.RoundRoute
+
 import com.google.gson.annotations.SerializedName
 
-data class Metadata (
+data class Metadata(
 
-	@SerializedName("attribution") val attribution : String,
-	@SerializedName("service") val service : String,
-	@SerializedName("timestamp") val timestamp : Long,
-	@SerializedName("query") val query : Query,
-	@SerializedName("engine") val engine : Engine
+    @SerializedName("attribution") val attribution: String,
+    @SerializedName("service") val service: String,
+    @SerializedName("timestamp") val timestamp: Long,
+    @SerializedName("query") val query: Query,
+    @SerializedName("engine") val engine: Engine
 )

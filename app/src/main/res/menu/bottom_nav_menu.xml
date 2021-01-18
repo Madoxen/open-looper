@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/favorite_buttom"
-        android:title="favorite"
+    <item
+        android:id="@+id/favorite_buttom"
         android:icon="@drawable/ic_baseline_favorite_24"
-        />
+        android:title="favorite" />
 
-    <item android:id="@+id/placeholder"
-        android:title=""
+    <item
+        android:id="@+id/placeholder"
         android:enabled="false"
-        />
+        android:title="" />
 
-    <item android:id="@+id/record_buttom"
-        android:title="record"
+    <item
+        android:id="@+id/record_buttom"
         android:icon="@drawable/ic_baseline_fiber_manual_record_24"
-        />
+        android:title="record" />
 </menu>

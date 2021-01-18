@@ -9,11 +9,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 For support, please feel free to contact me at https://www.linkedin.com/in/syedabsar */
 package com.example.openlooper.model.RoundRoute
-import com.google.gson.annotations.SerializedName
-data class Query (
 
-	@SerializedName("coordinates") val coordinates : List<List<Double>>,
-	@SerializedName("profile") val profile : String,
-	@SerializedName("format") val format : String,
-	@SerializedName("options") val options : Options
+import com.google.gson.annotations.SerializedName
+
+data class Query(
+
+    @SerializedName("coordinates") val coordinates: List<List<Double>>,
+    @SerializedName("profile") val profile: String,
+    @SerializedName("format") val format: String,
+    @SerializedName("options") val options: Options
 )

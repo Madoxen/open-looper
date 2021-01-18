@@ -1,6 +1,5 @@
 package com.example.openlooper.VM
 
-import android.os.Debug
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,13 +18,12 @@ import org.osmdroid.util.GeoPoint
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class RouteVM : ViewModel() {
     private val logging: HttpLoggingInterceptor =
-        HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
-    private val httpClient: OkHttpClient.Builder = OkHttpClient.Builder().addInterceptor(logging);
+        HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+    private val httpClient: OkHttpClient.Builder = OkHttpClient.Builder().addInterceptor(logging)
     private val retrofit: Retrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create()) //This converts from java objects to JSON and vice versa
         .baseUrl("https://api.openrouteservice.org/")
@@ -33,13 +31,13 @@ class RouteVM : ViewModel() {
         .build()
 
     private val service: ORSService = retrofit.create(ORSService::class.java)
-    val currentRoute: LiveData<List<GeoPoint>> = MutableLiveData<List<GeoPoint>>();
-    var lastPoint: GeoPoint? = null;
-    val random: Random = Random();
+    val currentRoute: LiveData<List<GeoPoint>> = MutableLiveData<List<GeoPoint>>()
+    var lastPoint: GeoPoint? = null
+    val random: Random = Random()
 
 
     init {
-        clearRoute();
+        clearRoute()
     }
 
     fun getNewRoute(point: GeoPoint = GeoPoint(51.0, 0.0)) {
@@ -58,45 +56,45 @@ class RouteVM : ViewModel() {
                     s.features[0].geometry.coordinates.forEach {
                         l.add(GeoPoint(it[1], it[0]))
                     }
-                    currentRoute.value = l;
+                    currentRoute.value = l
                 }
             } catch (e: Exception) {
-                Log.e("OpenLooper", e.message.toString());
+                Log.e("OpenLooper", e.message.toString())
             }
         }
     }
 
     fun setRoute(points: List<GeoPoint>) {
         if (currentRoute is MutableLiveData<*>)
-            currentRoute.value = points.toMutableList();
+            currentRoute.value = points.toMutableList()
     }
 
     fun clearRoute() {
         if (currentRoute is MutableLiveData<*>)
-            currentRoute.value = mutableListOf<GeoPoint>();
+            currentRoute.value = mutableListOf<GeoPoint>()
     }
 
     //Adds point to currentRoute
     fun addPoint(point: GeoPoint) {
         if (currentRoute is MutableLiveData<*>) {
             //This is wasteful, because we are throwing entire list away instead of modifying already existing one.
-            val c = currentRoute.value as List<GeoPoint>;
-            val l: MutableList<GeoPoint> = c?.toMutableList() ?: mutableListOf<GeoPoint>();
-            l.add(point);
-            currentRoute.value = l;
+            val c = currentRoute.value as List<GeoPoint>
+            val l: MutableList<GeoPoint> = c.toMutableList()
+            l.add(point)
+            currentRoute.value = l
         }
     }
 
     fun getRouteTotalLength(): Double {
-        var dist = 0.0;
+        var dist = 0.0
         currentRoute.value?.let {
-            val limit = it.count() - 2; //omit last value
-            if(limit < 1) return dist;
+            val limit = it.count() - 2 //omit last value
+            if (limit < 1) return dist
             for (i in 0..limit) {
                 dist += calculateGeographicalDistance(it[i], it[i + 1])
             }
         }
-        return dist;
+        return dist
     }
 
 }

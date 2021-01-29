@@ -8,14 +8,17 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.SeekBar
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -51,19 +54,19 @@ class HomeView : Fragment() {
     lateinit var map: MapView
     var locationOverlay: MyLocationNewOverlay? = null
     lateinit var mBottomAppBar: BottomAppBar
-    lateinit var mBottomSheet: LinearLayout
-    lateinit var mBottomBehavior: BottomSheetBehavior<View>
     lateinit var mBottomFAB: FloatingActionButton
     lateinit var mBottomNavigationView: BottomNavigationView
     lateinit var mAddFavouriteFAB: FloatingActionButton
     lateinit var mFavoriteSide: NavigationView
     lateinit var mDistanceText: TextView
     lateinit var track: Polyline
+    lateinit var mDistanceBar: SeekBar;
+    lateinit var mRouteLengthTextView: TextView;
+    lateinit var mBottomSheetBehaviour: BottomSheetBehavior<ConstraintLayout>;
     var isRecording = false
 
 
     /*SERVICES*/
-
     /** Defines callbacks for service binding, passed to bindService()  */
     private val connection = object : ServiceConnection {
 
@@ -115,18 +118,20 @@ class HomeView : Fragment() {
         //Swipe bottom menu
         mBottomAppBar = view.findViewById(R.id.bottom_app_bar)
         mBottomFAB = view.findViewById(R.id.bottom_FAB)
-        mBottomSheet = view.findViewById(R.id.bottom_sheet_swipe)
-        mBottomBehavior =
-            BottomSheetBehavior.from(mBottomSheet.findViewById(R.id.bottom_sheet_swipe))
         mBottomNavigationView = view.findViewById(R.id.bottom_nav_view)
         mFavoriteSide = view.findViewById((R.id.favorite_side))
         mDistanceText = view.findViewById(R.id.distance_textView)
         mAddFavouriteFAB = view.findViewById(R.id.add_to_favorite_fab)
+        mDistanceBar = view.findViewById(R.id.distance_seekBar)
+        mRouteLengthTextView = view.findViewById(R.id.routeLength_textView)
+        mBottomSheetBehaviour =
+            BottomSheetBehavior.from(view.findViewById(R.id.bottom_sheet_options_modal));
         //Remove weird navbar view
         mBottomAppBar.bottom_nav_view.background = null
         track = Polyline()
 
 
+        mBottomSheetBehaviour.state = BottomSheetBehavior.STATE_HIDDEN;
         //Set some defaults
         //Set preferences (e.g user-agent for osmdroid)
         Configuration.getInstance()
@@ -139,24 +144,65 @@ class HomeView : Fragment() {
         map.setMultiTouchControls(true)
         map.overlayManager.add(track)
 
+
         //Observe changes to the track
         vm.currentRoute.observe(viewLifecycleOwner, Observer { t ->
             track.setPoints(t)
             val distance = vm.getRouteTotalLength()
             mDistanceText.text = "%.2f".format(distance) + "km"
-            Log.e("Route changed", t.count().toString())
         })
 
-        mBottomBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         mBottomFAB.setOnClickListener {
             FAB_FindRoute()
         }
 
         mAddFavouriteFAB.setOnClickListener() {
             vm.currentRoute.value?.let {
-                vmFav.addFavorite(Favorite(0,"New favourite route!",vm.getRouteTotalLength(), it))
+                vmFav.addFavorite(Favorite(0, "New favourite route!", vm.getRouteTotalLength(), it))
             }
         }
+
+        mBottomFAB.setOnLongClickListener()
+        {
+            mBottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED;
+            true
+        }
+
+        mBottomSheetBehaviour.addBottomSheetCallback(
+            object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+                }
+
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+
+                    when (newState) {
+                        BottomSheetBehavior.STATE_COLLAPSED -> {
+                            val p : CoordinatorLayout.LayoutParams = mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
+                            p.anchorId = R.id.bottom_sheet_options_modal;
+                            mBottomFAB.layoutParams = p;
+                        }
+                        BottomSheetBehavior.STATE_DRAGGING -> {
+                            val p : CoordinatorLayout.LayoutParams = mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
+                            p.anchorId = R.id.bottom_sheet_options_modal;
+                            mBottomFAB.layoutParams = p;
+                        }
+                        BottomSheetBehavior.STATE_SETTLING -> {
+                            val p : CoordinatorLayout.LayoutParams = mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
+                            p.anchorId = R.id.bottom_sheet_options_modal;
+                            mBottomFAB.layoutParams = p;
+                        }
+                        BottomSheetBehavior.STATE_HIDDEN -> {
+                            val p : CoordinatorLayout.LayoutParams = mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
+                            p.anchorId = R.id.bottom_app_bar;
+                            mBottomFAB.layoutParams = p;
+                        }
+                    }
+
+                }
+            }
+        )
+
 
         mBottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
@@ -196,6 +242,34 @@ class HomeView : Fragment() {
             }
             true
         }
+
+
+        mBottomAppBar.setOnClickListener() {
+            Log.d("OpenLooper", "Clicked bottom app bar");
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mDistanceBar.min = 100
+        };
+
+        mDistanceBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // TODO Auto-generated method stub
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // TODO Auto-generated method stub
+            }
+
+            override fun onProgressChanged(
+                seekBar: SeekBar?,
+                progress: Int,
+                fromUser: Boolean
+            ) {
+                mRouteLengthTextView.text = (progress / 1000.0).toString() + " km";
+                vm.distance.value = progress;
+            }
+        })
 
         // Recyclerview
         val adapter = AdapterFavRoute {
@@ -303,5 +377,6 @@ class HomeView : Fragment() {
             vm.addPoint(point)
         vm.lastPoint = point
     }
+
 
 }

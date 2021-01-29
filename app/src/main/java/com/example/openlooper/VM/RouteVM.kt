@@ -32,6 +32,7 @@ class RouteVM : ViewModel() {
 
     private val service: ORSService = retrofit.create(ORSService::class.java)
     val currentRoute: LiveData<List<GeoPoint>> = MutableLiveData<List<GeoPoint>>()
+    val distance: MutableLiveData<Int> = MutableLiveData(1000);
     var lastPoint: GeoPoint? = null
     val random: Random = Random()
 
@@ -48,7 +49,12 @@ class RouteVM : ViewModel() {
                     "foot-hiking", BuildConfig.ORS_API,
                     GETRoundRoute.BuildFromGeoPoint(
                         point,
-                        Options(Round_trip(10000, random.nextInt()))
+                        Options(
+                            Round_trip(
+                                distance.value!!,
+                                random.nextInt()
+                            )
+                        )
                     )
                 )
                 if (currentRoute is MutableLiveData<*>) {

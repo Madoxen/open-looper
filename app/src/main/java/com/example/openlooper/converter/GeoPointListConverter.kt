@@ -2,6 +2,7 @@ package com.example.openlooper.converter
 
 import androidx.room.TypeConverter
 import org.osmdroid.util.GeoPoint
+import java.lang.Exception
 import java.util.*
 
 class GeoPointListConverter {
@@ -26,11 +27,13 @@ class GeoPointListConverter {
         var array = str.split("|")
         var list: MutableList<GeoPoint> = mutableListOf()
         array.forEach {
-            var doubleArr = it.split(":")
-            var point =
-                GeoPoint(doubleArr[0].toDouble(), doubleArr[1].toDouble(), doubleArr[2].toDouble())
-            //Log.i("WTF","${point.latitude} : ${point.longitude} : ${point.altitude}")
-            list.add(point)
+            try {
+                var doubleArr = it.split(":")
+                var point =
+                    GeoPoint(doubleArr[0].toDouble(), doubleArr[1].toDouble(), doubleArr[2].toDouble())
+                list.add(point)
+            }
+            catch (e : Exception) {}
         }
         return Collections.unmodifiableList(list)
     }

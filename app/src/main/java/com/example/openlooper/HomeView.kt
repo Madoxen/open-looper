@@ -2,10 +2,8 @@ package com.example.openlooper
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.app.AlertDialog
+import android.content.*
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
@@ -19,6 +17,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -34,6 +33,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.favorite_add_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_home_view.view.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
@@ -42,6 +42,8 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 
 class HomeView : Fragment() {
@@ -157,9 +159,21 @@ class HomeView : Fragment() {
         }
 
         mAddFavouriteFAB.setOnClickListener() {
-            vm.currentRoute.value?.let {
-                vmFav.addFavorite(Favorite(0, "New favourite route!", vm.getRouteTotalLength(), it))
+            val builder = AlertDialog.Builder(requireContext())
+            val inflater = inflater.inflate(R.layout.favorite_add_dialog, null)
+            inflater.fav_disc.setText(
+                "%.2f".format(vm.getRouteTotalLength()) + "km"
+            )
+
+            builder.setView(inflater)
+            builder.setPositiveButton("Add Road") { _, _ ->
+
+                vm.currentRoute.value?.let {
+                    vmFav.addFavorite(Favorite(0,"${inflater.fav_name_edit.text}",vm.getRouteTotalLength(), it))
+                }
             }
+            builder.setNegativeButton("Cancel"){ _, _ -> }
+            builder.create().show()
         }
 
         mBottomFAB.setOnLongClickListener()
@@ -272,9 +286,31 @@ class HomeView : Fragment() {
         })
 
         // Recyclerview
-        val adapter = AdapterFavRoute {
+        val adapter = AdapterFavRoute({
             vm.setRoute(it.coordinates)
-        }
+        },{
+            val builder = AlertDialog.Builder(requireContext())
+            val inflater = inflater.inflate(R.layout.favorite_add_dialog, null)
+            inflater.fav_disc.setText(
+                "${BigDecimal(it.distance).setScale(2, RoundingMode.HALF_EVEN)} km"
+            )
+            inflater.fav_name_edit.setText(it.name);
+
+            builder.setView(inflater)
+            builder.setPositiveButton("Save") { _, _ ->
+                val fav = it;
+                vm.currentRoute.value?.let {
+                    vmFav.updateFavorite(Favorite(fav.id,"${inflater.fav_name_edit.text}",fav.distance, fav.coordinates))
+                }
+            }
+            builder.setNegativeButton("Delete"){ _, _ ->
+                val fav = it;
+                vm.currentRoute.value?.let {
+                    vmFav.deleteFavorite(fav)
+                }
+            }
+            builder.create().show()
+        })
         val recyclerView = view.favorite_list_view
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())

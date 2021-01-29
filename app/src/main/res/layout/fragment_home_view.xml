@@ -18,7 +18,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+
     </org.osmdroid.views.MapView>
+
+
 
     <TextView
         android:id="@+id/distance_textView"
@@ -40,6 +43,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         >
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/follow_button"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginLeft="320dp"
+            app:cornerRadius="50dp"
+            android:padding="16dp"
+            app:icon="@drawable/ic_baseline_place_24"
+
+            />
 
 
         <com.google.android.material.bottomappbar.BottomAppBar

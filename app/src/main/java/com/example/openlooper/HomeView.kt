@@ -3,7 +3,10 @@ package com.example.openlooper
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
@@ -13,11 +16,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -65,6 +69,7 @@ class HomeView : Fragment() {
     lateinit var mDistanceBar: SeekBar;
     lateinit var mRouteLengthTextView: TextView;
     lateinit var mBottomSheetBehaviour: BottomSheetBehavior<ConstraintLayout>;
+    lateinit var mFollowButton: Button
     var isRecording = false
 
 
@@ -130,6 +135,7 @@ class HomeView : Fragment() {
             BottomSheetBehavior.from(view.findViewById(R.id.bottom_sheet_options_modal));
         //Remove weird navbar view
         mBottomAppBar.bottom_nav_view.background = null
+        mFollowButton = view.findViewById(R.id.follow_button)
         track = Polyline()
 
 
@@ -169,11 +175,23 @@ class HomeView : Fragment() {
             builder.setPositiveButton("Add Road") { _, _ ->
 
                 vm.currentRoute.value?.let {
-                    vmFav.addFavorite(Favorite(0,"${inflater.fav_name_edit.text}",vm.getRouteTotalLength(), it))
+                    if (vm.getRouteTotalLength() != 0.0) {
+                        vmFav.addFavorite(
+                            Favorite(
+                                0,
+                                "${inflater.fav_name_edit.text}",
+                                vm.getRouteTotalLength(),
+                                it
+                            )
+                        )
+                    } else {
+                        Toast.makeText(this.context, "This route is empty !", Toast.LENGTH_LONG)
+                            .show()
+                    }
                 }
+                builder.setNegativeButton("Cancel") { _, _ -> }
+                builder.create().show()
             }
-            builder.setNegativeButton("Cancel"){ _, _ -> }
-            builder.create().show()
         }
 
         mBottomFAB.setOnLongClickListener()
@@ -192,22 +210,26 @@ class HomeView : Fragment() {
 
                     when (newState) {
                         BottomSheetBehavior.STATE_COLLAPSED -> {
-                            val p : CoordinatorLayout.LayoutParams = mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
+                            val p: CoordinatorLayout.LayoutParams =
+                                mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
                             p.anchorId = R.id.bottom_sheet_options_modal;
                             mBottomFAB.layoutParams = p;
                         }
                         BottomSheetBehavior.STATE_DRAGGING -> {
-                            val p : CoordinatorLayout.LayoutParams = mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
+                            val p: CoordinatorLayout.LayoutParams =
+                                mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
                             p.anchorId = R.id.bottom_sheet_options_modal;
                             mBottomFAB.layoutParams = p;
                         }
                         BottomSheetBehavior.STATE_SETTLING -> {
-                            val p : CoordinatorLayout.LayoutParams = mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
+                            val p: CoordinatorLayout.LayoutParams =
+                                mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
                             p.anchorId = R.id.bottom_sheet_options_modal;
                             mBottomFAB.layoutParams = p;
                         }
                         BottomSheetBehavior.STATE_HIDDEN -> {
-                            val p : CoordinatorLayout.LayoutParams = mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
+                            val p: CoordinatorLayout.LayoutParams =
+                                mBottomFAB.layoutParams as CoordinatorLayout.LayoutParams;
                             p.anchorId = R.id.bottom_app_bar;
                             mBottomFAB.layoutParams = p;
                         }
@@ -288,7 +310,7 @@ class HomeView : Fragment() {
         // Recyclerview
         val adapter = AdapterFavRoute({
             vm.setRoute(it.coordinates)
-        },{
+        }, {
             val builder = AlertDialog.Builder(requireContext())
             val inflater = inflater.inflate(R.layout.favorite_add_dialog, null)
             inflater.fav_disc.setText(
@@ -300,10 +322,17 @@ class HomeView : Fragment() {
             builder.setPositiveButton("Save") { _, _ ->
                 val fav = it;
                 vm.currentRoute.value?.let {
-                    vmFav.updateFavorite(Favorite(fav.id,"${inflater.fav_name_edit.text}",fav.distance, fav.coordinates))
+                    vmFav.updateFavorite(
+                        Favorite(
+                            fav.id,
+                            "${inflater.fav_name_edit.text}",
+                            fav.distance,
+                            fav.coordinates
+                        )
+                    )
                 }
             }
-            builder.setNegativeButton("Delete"){ _, _ ->
+            builder.setNegativeButton("Delete") { _, _ ->
                 val fav = it;
                 vm.currentRoute.value?.let {
                     vmFav.deleteFavorite(fav)
@@ -357,6 +386,12 @@ class HomeView : Fragment() {
             map.controller.setCenter(overlay.myLocation)
             locationOverlay = overlay
             mService.addLocationChangedListener(::onLocationChanged)
+
+            //Add on click follow botton
+            mFollowButton.setOnClickListener {
+                map.controller.setCenter(overlay.myLocation)
+                overlay.enableFollowLocation()
+            }
         }
     }
 

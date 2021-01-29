@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -60,6 +61,7 @@ class HomeView : Fragment() {
     lateinit var mFavoriteSide: NavigationView
     lateinit var mDistanceText: TextView
     lateinit var track: Polyline
+    lateinit var mFollowButton: Button
     var isRecording = false
 
 
@@ -125,6 +127,7 @@ class HomeView : Fragment() {
         mAddFavouriteFAB = view.findViewById(R.id.add_to_favorite_fab)
         //Remove weird navbar view
         mBottomAppBar.bottom_nav_view.background = null
+        mFollowButton = view.findViewById(R.id.follow_button)
         track = Polyline()
 
 
@@ -139,6 +142,7 @@ class HomeView : Fragment() {
         map.zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         map.setMultiTouchControls(true)
         map.overlayManager.add(track)
+
 
         //Observe changes to the track
         vm.currentRoute.observe(viewLifecycleOwner, Observer { t ->
@@ -259,6 +263,12 @@ class HomeView : Fragment() {
             map.controller.setCenter(overlay.myLocation)
             locationOverlay = overlay
             mService.addLocationChangedListener(::onLocationChanged)
+
+            //Add on click follow botton
+            mFollowButton.setOnClickListener {
+                map.controller.setCenter(overlay.myLocation)
+                overlay.enableFollowLocation()
+            }
         }
     }
 

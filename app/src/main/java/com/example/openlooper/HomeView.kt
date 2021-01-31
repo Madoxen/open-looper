@@ -189,9 +189,9 @@ class HomeView : Fragment() {
                             .show()
                     }
                 }
-                builder.setNegativeButton("Cancel") { _, _ -> }
-                builder.create().show()
             }
+            builder.setNegativeButton("Cancel") { _, _ -> }
+            builder.create().show()
         }
 
         mBottomFAB.setOnLongClickListener()

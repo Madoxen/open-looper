@@ -406,7 +406,6 @@ class HomeView : Fragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-
     private fun FAB_FindRoute() {
         mService.stopRecording()
         mService.resetRecording()
@@ -418,11 +417,8 @@ class HomeView : Fragment() {
     private fun FAB_ToggleRecord() {
         val i = Intent(requireActivity(), LocationRecorderService::class.java)
         requireActivity().startService(i)
-
         if (mService.isRecording) {
             mService.stopRecording()
-            mService.resetRecording()
-            vm.clearRoute()
             mBottomFAB.setImageDrawable(
                 ContextCompat.getDrawable(
                     requireContext(),
@@ -430,6 +426,8 @@ class HomeView : Fragment() {
                 )
             )
         } else {
+            mService.resetRecording()
+            vm.clearRoute()
             mService.startRecording()
             mBottomFAB.setImageDrawable(
                 ContextCompat.getDrawable(
@@ -448,6 +446,4 @@ class HomeView : Fragment() {
             vm.addPoint(point)
         vm.lastPoint = point
     }
-
-
 }

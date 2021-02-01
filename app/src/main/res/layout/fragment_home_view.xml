@@ -33,6 +33,7 @@
         android:textColor="@color/purple_700"
         android:textSize="30sp" />
 
+    <!-- Egzamin -->
     <TextView
         android:id="@+id/height_textView"
         android:layout_width="match_parent"

@@ -14,7 +14,9 @@ data class Favorite(
     val name: String,
     val distance: Double,
     val coordinates: List<GeoPoint>,
+//EGZAMIN
+//=====================================================
     val MaxAltitude: Double = 0.0
 )
-
+//=====================================================
 

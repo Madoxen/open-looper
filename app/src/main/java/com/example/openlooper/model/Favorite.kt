@@ -13,7 +13,8 @@ data class Favorite(
     val id: Int = 0,
     val name: String,
     val distance: Double,
-    val coordinates: List<GeoPoint>
+    val coordinates: List<GeoPoint>,
+    val MaxAltitude: Double = 0.0
 )
 
 

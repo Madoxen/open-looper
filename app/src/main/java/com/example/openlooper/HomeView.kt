@@ -183,7 +183,8 @@ class HomeView : Fragment() {
                                 0,
                                 "${inflater.fav_name_edit.text}",
                                 vm.getRouteTotalLength(),
-                                it
+                                it,
+                                0.0 // HERE PASTE MAX HIGHT !!!
                             )
                         )
                     } else {
@@ -329,7 +330,8 @@ class HomeView : Fragment() {
                             fav.id,
                             "${inflater.fav_name_edit.text}",
                             fav.distance,
-                            fav.coordinates
+                            fav.coordinates,
+                            0.0 // HERE PASTE MAX HIGHT !!!
                         )
                     )
                 }

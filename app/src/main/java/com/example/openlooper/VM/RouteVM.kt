@@ -59,9 +59,21 @@ class RouteVM : ViewModel() {
                 )
                 if (currentRoute is MutableLiveData<*>) {
                     val l: MutableList<GeoPoint> = mutableListOf()
+                    var maxHeight = Double.MIN_VALUE;
+                    var minHeight = Double.MAX_VALUE;
                     s.features[0].geometry.coordinates.forEach {
                         l.add(GeoPoint(it[1], it[0]))
+                        if(maxHeight < it[2])
+                            maxHeight = it[2];
+
+                        if(minHeight > it[2])
+                            minHeight = it[2]
                     }
+
+                    val deltaHeight = maxHeight - minHeight;
+
+
+
                     currentRoute.value = l
                 }
             } catch (e: Exception) {

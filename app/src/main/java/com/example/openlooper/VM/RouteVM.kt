@@ -114,6 +114,9 @@ class RouteVM : ViewModel() {
             val l: MutableList<GeoPoint> = c.toMutableList()
             l.add(point)
             currentRoute.value = l
+
+            if(deltaHeight is MutableLiveData<Double>)
+                deltaHeight.value = 0.0;
         }
     }
 

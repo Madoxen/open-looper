@@ -65,6 +65,7 @@ class HomeView : Fragment() {
     lateinit var mAddFavouriteFAB: FloatingActionButton
     lateinit var mFavoriteSide: NavigationView
     lateinit var mDistanceText: TextView
+    lateinit var mHeightText: TextView
     lateinit var track: Polyline
     lateinit var mDistanceBar: SeekBar;
     lateinit var mRouteLengthTextView: TextView;
@@ -123,6 +124,7 @@ class HomeView : Fragment() {
         val view = inflater.inflate(R.layout.fragment_home_view, container, false)
 
         //Swipe bottom menu
+        mHeightText = view.findViewById(R.id.height_textView)
         mBottomAppBar = view.findViewById(R.id.bottom_app_bar)
         mBottomFAB = view.findViewById(R.id.bottom_FAB)
         mBottomNavigationView = view.findViewById(R.id.bottom_nav_view)

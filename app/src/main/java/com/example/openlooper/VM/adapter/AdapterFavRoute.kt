@@ -40,7 +40,7 @@ class AdapterFavRoute(
         val currentItem = favList[position]
         holder.itemView.route_name_one_row.text = currentItem.name
         holder.itemView.route_distance_one_row.text = "Odległość: %.2f".format(currentItem.distance) + "km";
-        holder.itemView.route_delta_height.text = "Przewyższenie: %.2f".format(currentItem.MaxAltitude) + "m"
+        holder.itemView.route_delta_height.text = "Przewyższenie: %.2f".format(currentItem.MaxAltitude) + "m" //EGZAMIN
 
         holder.itemView.favorite_one_row_id.setOnClickListener {
             //Load route from database

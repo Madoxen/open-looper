@@ -32,7 +32,7 @@ class RouteVM : ViewModel() {
 
     private val service: ORSService = retrofit.create(ORSService::class.java)
     val currentRoute: LiveData<List<GeoPoint>> = MutableLiveData<List<GeoPoint>>()
-    val deltaHeight: LiveData<Double> = MutableLiveData<Double>(0.0);
+    val deltaHeight: LiveData<Double> = MutableLiveData<Double>(0.0); //EGZAMIN
     val distance: MutableLiveData<Int> = MutableLiveData(1000);
     var lastPoint: GeoPoint? = null
     val random: Random = Random()
@@ -62,6 +62,9 @@ class RouteVM : ViewModel() {
                     val l: MutableList<GeoPoint> = mutableListOf()
                     var maxHeight = Double.MIN_VALUE;
                     var minHeight = Double.MAX_VALUE;
+
+                    //EGZAMIN
+                    //=====================================================
                     s.features[0].geometry.coordinates.forEach {
                         l.add(GeoPoint(it[1], it[0]))
 
@@ -75,7 +78,6 @@ class RouteVM : ViewModel() {
                         }
                     }
 
-
                     if(deltaHeight is MutableLiveData<Double>)
                     {
                         if(maxHeight != Double.MIN_VALUE && minHeight != Double.MAX_VALUE)
@@ -87,7 +89,7 @@ class RouteVM : ViewModel() {
                             deltaHeight.value = 0.0;
                         }
                     }
-
+                    //======================================================
                     currentRoute.value = l
                 }
             } catch (e: Exception) {
@@ -115,8 +117,8 @@ class RouteVM : ViewModel() {
             l.add(point)
             currentRoute.value = l
 
-            if(deltaHeight is MutableLiveData<Double>)
-                deltaHeight.value = 0.0;
+            if(deltaHeight is MutableLiveData<Double>)//EGZAMIN
+                deltaHeight.value = 0.0;//EGZAMIN
         }
     }
 

@@ -162,6 +162,10 @@ class HomeView : Fragment() {
             mDistanceText.text = "%.2f".format(distance) + "km"
         })
 
+        vm.deltaHeight.observe(viewLifecycleOwner, Observer {
+            mHeightText.text = "DH %.2f".format(it) + "m";
+        })
+
         mBottomFAB.setOnClickListener {
             FAB_FindRoute()
         }
@@ -184,7 +188,7 @@ class HomeView : Fragment() {
                                 "${inflater.fav_name_edit.text}",
                                 vm.getRouteTotalLength(),
                                 it,
-                                0.0 // HERE PASTE MAX HIGHT !!!
+                                vm.deltaHeight.value!! // HERE PASTE MAX HIGHT !!!
                             )
                         )
                     } else {
@@ -331,7 +335,7 @@ class HomeView : Fragment() {
                             "${inflater.fav_name_edit.text}",
                             fav.distance,
                             fav.coordinates,
-                            0.0 // HERE PASTE MAX HIGHT !!!
+                            fav.MaxAltitude// HERE PASTE MAX HIGHT !!!
                         )
                     )
                 }

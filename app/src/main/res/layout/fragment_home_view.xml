@@ -38,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="top|left"
-        android:text="Przewyższenie 20 m"
+        android:text="DH 0m"
         android:textColor="@color/purple_700"
         android:textSize="30sp"
         />

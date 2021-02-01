@@ -5,8 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.openlooper.model.Favorite
-
+//EGZAMIN
+//=====================================================
 @Database(entities = [Favorite::class], version = 3, exportSchema = false)
+//=====================================================
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun favoriteDao(): FavoriteDao
